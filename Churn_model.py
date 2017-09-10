@@ -11,12 +11,21 @@ from sklearn.preprocessing import StandardScaler
 
 
 def cross_val(model,X,y,cv):
+    '''
+    cross validate selected model and return validation scores
+    '''
+
     f1 = make_scorer(f1_score)
     scores = cross_val_score(model,X,y,scoring=f1,cv=cv)
     return scores
 
 def base_design_matrix(df):
-    '''Baseline model with all available features'''
+    '''
+    Create training set and testing set design matrix and labels with all available features
+    Input: processed data
+    Output: design matrix, labels and features included
+    '''
+
     y = df.pop('churn').values
     # capture the extreme usage behavior
     df['extreme_weekday_usage'] = ((df['weekday_pct'] == 0)|(df['weekday_pct'] == 100)).astype(int)
@@ -32,11 +41,23 @@ def base_design_matrix(df):
     return X_train,X_test,y_train,y_test, df.columns
 
 def standardize_col(df,col):
+    '''
+    Standardize columns
+    Input: dataframe, column
+    Output: dataframe with standardized column and standardscaler
+    '''
+
     sc = StandardScaler()
     df[col+'_std'] = sc.fit_transform(df[col])
     return df,sc
 
 def design_matrix(df,test=False):
+    '''
+    Create design matrix and labels with selected features
+    Input: dataframe
+    Output: design matrix, labels and features included
+    '''
+
     #feature selection design matrix
     y = df.pop('churn').values
     df['extreme_weekday_usage'] = ((df['weekday_pct'] == 0)|(df['weekday_pct'] == 100)).astype(int)
@@ -53,6 +74,12 @@ def design_matrix(df,test=False):
         return X_train,X_test,y_train,y_test,cols
 
 def lr_search(X_train,X_test,y_train,y_test,cols):
+    '''
+    evaluate logistic regression metrics
+    Input: training data, testing data and columns selected
+    Output: logistic regression model
+    '''
+
     lr = LogisticRegression()
     valid_scores = cross_val(lr,X_train,y_train,5)
     lr.fit(X_train,y_train)
@@ -78,6 +105,10 @@ def lr_search(X_train,X_test,y_train,y_test,cols):
 
 
 def test_final_model(model):
+    '''
+    Test final model on held out testing data
+    '''
+
     test_data = load_data('data/churn_test.csv')
     test_data = data_processing(test_data)
 
@@ -91,6 +122,7 @@ def test_final_model(model):
 
 def plot_distribution_by_churn(df,col):
     '''feature values distribution vs churn'''
+
     plt.hist(df[col][df['churn'] == 0],bins=20,alpha=.3,label='not churn')
     plt.hist(df[col][df['churn'] == 1],bins=20,alpha=.3,label='churn')
     plt.xlabel(col)

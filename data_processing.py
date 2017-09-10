@@ -3,6 +3,12 @@ import datetime
 
 
 def load_data(path):
+    '''
+    load data to pandas DataFrame, convert date columns to datetime type and create target variable
+    Input: path for dataset
+    Output: pandas DataFrame
+    '''
+
     df = pd.read_csv(path, parse_dates=['last_trip_date','signup_date'])
     # create target varible churn
     date_cutoff = datetime.date(2014, 6, 1)
@@ -11,6 +17,12 @@ def load_data(path):
 
 
 def data_processing(df):
+    '''
+    data processing - feature engineering and dummify categorical variables
+    Input: dataframe
+    Output: processed dataframe 
+    '''
+
     # drop irrelavant signup_date column
     # drop last_trip_date column to avoid data leakage
     df.drop(['last_trip_date','signup_date'],axis=1,inplace=True)
